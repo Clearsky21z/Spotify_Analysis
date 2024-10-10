@@ -1,14 +1,16 @@
 ---
-title: "My title"
-subtitle: "My subtitle if needed"
+title: "A Comparative Analysis of Valence, Duration, and Energy in the Music of JJ Lin, Joker Xue, and Leehom Wang"
 author: 
-  - First author
-  - Another author
+  - John Zhang
+  - Heyucheng Zhang
+  - Ariel Xing
+  - Haoan Wang
 thanks: "Code and data are available at: https://github.com/Clearsky21z/Spotify_Analysis"
 date: today
 date-format: long
-abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
+abstract: "This study examines the trends in valence, duration, and energy in the music of three prominent Chinese pop artists: JJ Lin, Joker Xue, and Leehom Wang. Valence, representing the emotional tone of a song, generally shows a slight decline across all three artists, with Joker Xue experiencing the most significant drop. Song duration remains stable for Joker Xue and Leehom Wang but increases for JJ Lin over time. In contrast, energy trends show JJ Lin and Joker Xue with declining intensity, while Leehom Wang's music becomes more energetic."
 format: pdf
+toc: true
 number-sections: true
 bibliography: references.bib
 ---
@@ -19,176 +21,169 @@ bibliography: references.bib
 #| message: false
 
 library(tidyverse)
-library(palmerpenguins)
-```
+library(here)
+library(usethis)
+library(spotifyr)
+library(ggplot2)
+library(knitr)
 
+jj_lin <- readRDS(here("data/01-raw_data/jj_lin.rds"))
+leehom_wang <- readRDS(here("data/01-raw_data/leehom_wang.rds"))
+joker_xue <- readRDS(here("data/01-raw_data/joker_xue.rds"))
+
+# Convert to tibble
+jj_lin <- as_tibble(jj_lin)
+leehom_wang <- as_tibble(leehom_wang)
+joker_xue <- as_tibble(joker_xue)
+```
 
 # Introduction
 
-Overview paragraph
+The evolution of musical trends in popular music is a well-documented phenomenon, often reflecting changes in cultural preferences, artistic expression, and technological advancements. In recent years, the global music scene has seen significant contributions from Chinese pop artists, among whom JJ Lin, Joker Xue, and Leehom Wang stand out. Each of these artists has built a reputation for their unique contributions to Mandarin pop music, characterized by distinct emotional tones and production qualities.
 
-Estimand paragraph
+Valence, energy, and song duration are key musical attributes that influence how audiences perceive songs. Valence represents the positivity or emotional tone of a track; energy captures the intensity or activity level in a song, while duration determines how long a piece lasts. Understanding how these attributes evolve over time can provide insights into the creative trajectories of these artists. This study aims to explore the trends in valence, duration, and energy in the discographies of JJ Lin, Joker Xue, and Leehom Wang, comparing how these elements have changed with the release of new albums over the past two decades.
 
-Results paragraph
+The remainder of this paper is constructed as follows. @sec-data provides a sample of the downloaded dataset, @sec-res gives three plots comparing Valence, Duration, and Energy in the Music of JJ Lin, Joker Xue, and Leehom Wang and @sec-disc mentiones a brief discussion of the result.
 
-Why it matters paragraph
-
-Telegraphing paragraph: The remainder of this paper is structured as follows. @sec-data....
-
-
-
-
-
+The data is downloaded using R @citeR and Spotify API @spotifyr with the help of usethis package @usethis, and the analysis is conducted with here @here, tidyverse @tidyverse, ggplot2 @ggplot and knitr @knitr.
 
 # Data {#sec-data}
-
-## Overview
-
-We use the statistical programming language R [@citeR].... Our data [@shelter].... Following @tellingstories, we consider...
-
-Overview text
-
-## Measurement
-	
-Some paragraphs about how we go from a phenomena in the world to an entry in the dataset.
-
-## Outcome variables
-
-Add graphs, tables and text. Use sub-sub-headings for each outcome variable or update the subheading to be singular.
-
-
-
-Some of our data is of penguins (@fig-bills), from @palmerpenguins.
-
-```{r}
-#| label: fig-bills
-#| fig-cap: Bills of penguins
-#| echo: false
-
-ggplot(penguins, aes(x = island, fill = species)) +
-  geom_bar(alpha = 0.8) +
-  scale_fill_manual(values = c("darkorange","purple","cyan4"),
-                    guide = "none") +
-  theme_minimal() +
-  facet_wrap(~species, ncol = 1) +
-  coord_flip()
-```
-
-Talk more about it.
-
-And also planes (@fig-planes). (You can change the height and width, but don't worry about doing that until you have finished every other aspect of the paper - Quarto will try to make it look nice and the defaults usually work well once you have enough text.)
-
-```{r}
-#| label: fig-planes
-#| fig-cap: Relationship between wing length and width
-#| echo: false
-#| warning: false
-#| message: false
-
-analysis_data <- read_csv(here::here("data/02-analysis_data/analysis_data.csv"))
-
-analysis_data |> 
-  ggplot(aes(x = width, y = length)) +
-  geom_point(alpha = 0.8) +
-  theme_minimal() +
-  labs(x = "Wing width (mm)",
-       y = "Wing length (mm)")
-```
-
-Talk way more about it. 
-
-## Predictor variables
-
-Add graphs, tables and text.
-
-Use sub-sub-headings for each outcome variable and feel free to combine a few into one if they go together naturally.
-
-
-
-
-
-
-
-
-# Model
-
-The goal of our modelling strategy is twofold. Firstly,...
-
-Here we briefly describe the Bayesian analysis model used to investigate... Background details and diagnostics are included in [Appendix -@sec-model-details].
-
-## Model set-up
-
-Define $y_i$ as the number of seconds that the plane remained aloft. Then $\beta_i$ is the wing width and $\gamma_i$ is the wing length, both measured in millimeters.  
-
-\begin{align} 
-y_i|\mu_i, \sigma &\sim \mbox{Normal}(\mu_i, \sigma) \\
-\mu_i &= \alpha + \beta_i + \gamma_i\\
-\alpha &\sim \mbox{Normal}(0, 2.5) \\
-\beta &\sim \mbox{Normal}(0, 2.5) \\
-\gamma &\sim \mbox{Normal}(0, 2.5) \\
-\sigma &\sim \mbox{Exponential}(1)
-\end{align}
-
-We run the model in R [@citeR] using the `rstanarm` package of @rstanarm. We use the default priors from `rstanarm`.
-
-
-### Model justification
-
-We expect a positive relationship between the size of the wings and time spent aloft. In particular...
-
-We can use maths by including latex between dollar signs, for instance $\theta$.
-
-
-# Results
-
-Our results are summarized in @tbl-modelresults.
-
 ```{r}
 #| echo: false
 #| eval: true
-#| warning: false
-#| message: false
-
-library(rstanarm)
-
-first_model <-
-  readRDS(file = here::here("models/first_model.rds"))
-```
-
-```{r}
-#| echo: false
-#| eval: true
-#| label: tbl-modelresults
-#| tbl-cap: "Explanatory models of flight time based on wing width and wing length"
+#| label: tbl-sample
+#| tbl-cap: "Sample Data"
 #| warning: false
 
-modelsummary::modelsummary(
-  list(
-    "First model" = first_model
-  ),
-  statistic = "mad",
-  fmt = 2
+# Bind the data for all three artists and add an artist_name column
+combined_data <- bind_rows(
+  jj_lin %>% mutate(artist_name = "JJ Lin"),
+  leehom_wang %>% mutate(artist_name = "Leehom Wang"),
+  joker_xue %>% mutate(artist_name = "Joker Xue")
 )
+
+# Select relevant columns and get the first 5 rows
+summary_stats <- combined_data %>%
+  select("album_release_date", "valence", "duration_ms", "energy") %>%
+  slice(1:5)  # or you can use head(5) instead of slice(1:5)
+
+# Render the summary table using knitr::kable()
+kable(summary_stats)
+```
+
+# Results{#sec-res}
+## Valence, Duration and Energy of Three Singers' Songs Over Time
+```{r}
+#| echo: false
+#| eval: true
+#| label: fig-valence
+#| fig-cap: "Valence of Three Singers' Songs Over Time"
+#| warning: false
+#| fig-pos: "H"
+
+# Select common columns and bind rows
+combined_data <- bind_rows(
+  select(jj_lin, artist_name, album_release_date, valence),
+  select(leehom_wang, artist_name, album_release_date, valence),
+  select(joker_xue, artist_name, album_release_date, valence)
+)
+
+# Create plot
+combined_data %>%
+  mutate(album_release_date = ymd(album_release_date)) %>%
+  ggplot(aes(x = album_release_date, y = valence, color = artist_name)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth() +
+  theme_minimal() +
+  facet_wrap(facets = vars(artist_name), dir = "v") +
+  labs(
+    x = "Album release date",
+    y = "Valence",
+    color = "Artist"
+  ) +
+  scale_color_brewer(palette = "Set1") +
+  theme(legend.position = "bottom")
 ```
 
 
+```{r}
+#| echo: false
+#| eval: true
+#| label: fig-duration
+#| fig-cap: "Duration of Three Singers' Songs Over Time"
+#| warning: false
+#| fig-pos: "H"
+
+combined_data_duration <- bind_rows(
+  select(jj_lin, artist_name, album_release_date, duration_ms),
+  select(leehom_wang, artist_name, album_release_date, duration_ms),
+  select(joker_xue, artist_name, album_release_date, duration_ms)
+)
+
+combined_data_duration %>%
+  mutate(album_release_date = ymd(album_release_date)) %>%
+  ggplot(aes(x = album_release_date, y = duration_ms, color = artist_name)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth() +
+  theme_minimal() +
+  facet_wrap(facets = vars(artist_name), dir = "v") +
+  labs(
+    x = "Album release date",
+    y = "Duration (ms)",
+    color = "Artist"
+  ) +
+  scale_color_brewer(palette = "Set1") +
+  theme(legend.position = "bottom")
+```
 
 
-# Discussion
+```{r}
+#| echo: false
+#| eval: true
+#| label: fig-energy
+#| fig-cap: "Energy of Three Singers' Songs Over Time"
+#| warning: false
+#| fig-pos: "H"
 
-## First discussion point {#sec-first-point}
+# Select common columns and bind rows
+combined_data_energy <- bind_rows(
+  select(jj_lin, artist_name, album_release_date, energy),
+  select(leehom_wang, artist_name, album_release_date, energy),
+  select(joker_xue, artist_name, album_release_date, energy)
+)
 
-If my paper were 10 pages, then should be be at least 2.5 pages. The discussion is a chance to show off what you know and what you learnt from all this. 
+combined_data_energy %>%
+  mutate(album_release_date = ymd(album_release_date)) %>%
+  ggplot(aes(x = album_release_date, y = energy, color = artist_name)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth() +
+  theme_minimal() +
+  facet_wrap(facets = vars(artist_name), dir = "v") +
+  labs(
+    x = "Album release date",
+    y = "Energy",
+    color = "Artist"
+  ) +
+  scale_color_brewer(palette = "Set1") +
+  theme(legend.position = "bottom")
 
-## Second discussion point
 
-Please don't use these as sub-heading labels - change them to be what your point actually is.
+```
+## Observations
+The graphs reveal notable trends in the music of JJ Lin, Joker Xue, and Leehom Wang over time. In terms of valence from @fig-valence, all three artists show a slight decline, indicating a shift toward less positive emotional tones in their songs. Joker Xue exhibits the most significant drop in valence, suggesting a move toward more melancholic or neutral themes. In @fig-duration for song duration, JJ Lin’s songs have become slightly longer over time, while Joker Xue and Leehom Wang have maintained consistent lengths. In terms of energy in @fig-energy, both JJ Lin and Joker Xue show a gradual decrease, indicating a shift to less intense, more mellow music. On the other hand, Leehom Wang's energy has increased, suggesting his recent work has become more dynamic and upbeat. Overall, these trends highlight the evolving styles and emotional expressions of the three artists.
 
-## Third discussion point
+# Discussion {#sec-disc}
+The comparative analysis of valence, duration, and energy across the discographies of JJ Lin, Joker Xue, and Leehom Wang reveals distinct trends that reflect both personal artistic development and broader shifts in pop music.
 
-## Weaknesses and next steps
+- Valence Trends: Across the three artists, valence—representing the emotional tone—generally shows a declining trend over time. JJ Lin’s music maintains a relatively stable, moderate valence but with a slight decline, suggesting a shift towards more emotionally neutral or melancholic compositions. Joker Xue, on the other hand, exhibits a more pronounced decline, reflecting a trend toward lower valence, potentially highlighting the artist's focus on more emotionally complex or darker themes. Leehom Wang also shows a subtle decrease, but with greater variability, indicating a broader emotional range in his discography.
 
-Weaknesses and next steps should also be included.
+- Duration Trends: Duration, measured in milliseconds, shows relatively stable trends for Joker Xue and Leehom Wang, with no significant variation in song lengths over time. However, JJ Lin shows a slight upward trend in song duration, indicating that his compositions may be growing longer over the years. This could reflect changes in the artist’s production style, possibly exploring more elaborate arrangements or storytelling within songs.
+
+- Energy Trends: Energy, which represents the intensity and activity level in a song, shows diverging trends among the three artists. JJ Lin's energy shows a slight decline, indicating a move toward more mellow or less intense productions. Similarly, Joker Xue also shows a decline, suggesting a preference for slower, perhaps more introspective music in recent years. In contrast, Leehom Wang's energy shows an upward trend, highlighting an increasing intensity in his later works, which may suggest experimentation with more upbeat or dynamic musical elements.
+
+- Broader Implications: These trends provide interesting insights into how individual artists evolve over time and how their music reflects personal or industry-wide changes. The decreasing valence in Joker Xue’s music could indicate a move towards more mature or introspective themes, while Leehom Wang's increasing energy may reflect his embrace of more dynamic and experimental production techniques. JJ Lin, meanwhile, seems to be extending the length of his compositions while maintaining a balanced emotional tone, perhaps catering to a broader audience.
+
+In summary, this study shows that while there are common trends in the emotional content (valence) and song structure (duration), the artists display significant individuality when it comes to the energy in their music. These findings may reflect the diversity of Chinese pop music and how artists adapt their style over time.
 
 \newpage
 
@@ -196,59 +191,60 @@ Weaknesses and next steps should also be included.
 
 # Appendix {-}
 
-
-# Additional data details
-
-# Model details {#sec-model-details}
-
-## Posterior predictive check
-
-In @fig-ppcheckandposteriorvsprior-1 we implement a posterior predictive check. This shows...
-
-In @fig-ppcheckandposteriorvsprior-2 we compare the posterior with the prior. This shows... 
-
 ```{r}
-#| eval: true
 #| echo: false
-#| message: false
+#| eval: true
+#| label: fig-appendix
+#| fig-cap: "Plot for Valence, Duration and Energy Distribution"
 #| warning: false
-#| label: fig-ppcheckandposteriorvsprior
-#| layout-ncol: 2
-#| fig-cap: "Examining how the model fits, and is affected by, the data"
-#| fig-subcap: ["Posterior prediction check", "Comparing the posterior with the prior"]
+#| fig-pos: "H"
 
-pp_check(first_model) +
-  theme_classic() +
+# Assuming combined_data is already created
+combined_data <- bind_rows(
+  jj_lin %>% mutate(artist_name = "JJ Lin"),
+  leehom_wang %>% mutate(artist_name = "Leehom Wang"),
+  joker_xue %>% mutate(artist_name = "Joker Xue")
+)
+
+# Plot for Valence Distribution
+ggplot(combined_data, aes(x = valence, fill = artist_name)) +
+  geom_density(alpha = 0.5) +
+  theme_minimal() +
+  labs(
+    title = "Distribution of Valence",
+    x = "Valence",
+    y = "Density",
+    fill = "Artist"
+  ) +
+  scale_fill_brewer(palette = "Set1") +
   theme(legend.position = "bottom")
 
-posterior_vs_prior(first_model) +
+# Plot for Duration Distribution
+ggplot(combined_data, aes(x = duration_ms, fill = artist_name)) +
+  geom_density(alpha = 0.5) +
   theme_minimal() +
-  scale_color_brewer(palette = "Set1") +
-  theme(legend.position = "bottom") +
-  coord_flip()
+  labs(
+    title = "Distribution of Duration (ms)",
+    x = "Duration (ms)",
+    y = "Density",
+    fill = "Artist"
+  ) +
+  scale_fill_brewer(palette = "Set1") +
+  theme(legend.position = "bottom")
+
+# Plot for Energy Distribution
+ggplot(combined_data, aes(x = energy, fill = artist_name)) +
+  geom_density(alpha = 0.5) +
+  theme_minimal() +
+  labs(
+    title = "Distribution of Energy",
+    x = "Energy",
+    y = "Density",
+    fill = "Artist"
+  ) +
+  scale_fill_brewer(palette = "Set1") +
+  theme(legend.position = "bottom")
 ```
-
-## Diagnostics
-
-@fig-stanareyouokay-1 is a trace plot. It shows... This suggests...
-
-@fig-stanareyouokay-2 is a Rhat plot. It shows... This suggests...
-
-```{r}
-#| echo: false
-#| eval: true
-#| message: false
-#| warning: false
-#| label: fig-stanareyouokay
-#| fig-cap: "Checking the convergence of the MCMC algorithm"
-#| fig-subcap: ["Trace plot", "Rhat plot"]
-#| layout-ncol: 2
-
-plot(first_model, "trace")
-
-plot(first_model, "rhat")
-```
-
 
 
 \newpage
