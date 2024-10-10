@@ -43,11 +43,12 @@ The evolution of musical trends in popular music is a well-documented phenomenon
 
 Valence, energy, and song duration are key musical attributes that influence how audiences perceive songs. Valence represents the positivity or emotional tone of a track; energy captures the intensity or activity level in a song, while duration determines how long a piece lasts. Understanding how these attributes evolve over time can provide insights into the creative trajectories of these artists. This study aims to explore the trends in valence, duration, and energy in the discographies of JJ Lin, Joker Xue, and Leehom Wang, comparing how these elements have changed with the release of new albums over the past two decades.
 
-The remainder of this paper is constructed as follows. @sec-data provides a sample of the downloaded dataset, @sec-res gives three plots comparing Valence, Duration, and Energy in the Music of JJ Lin, Joker Xue, and Leehom Wang and @sec-disc mentiones a brief discussion of the result.
+The remainder of this paper is constructed as follows. @sec-data provides a sample of the downloaded dataset, @sec-res includes three plots comparing Valence, Duration, and Energy in the Music of JJ Lin, Joker Xue, and Leehom Wang, with associated observations and @sec-disc mentions a brief discussion of the result obtained from the graph.
 
 The data is downloaded using R @citeR and Spotify API @spotifyr with the help of usethis package @usethis, and the analysis is conducted with here @here, tidyverse @tidyverse, ggplot2 @ggplot and knitr @knitr.
 
 # Data {#sec-data}
+@tbl-sample is a sample of the downloaded data from @spotify_api_sheeran, with relevant columns selected for later analysis(`valence`,`duration_ms`,`energy`).
 ```{r}
 #| echo: false
 #| eval: true
@@ -70,6 +71,7 @@ summary_stats <- combined_data %>%
 # Render the summary table using knitr::kable()
 kable(summary_stats)
 ```
+A more detailed representation of the dataset can be found in the appendix. It includes the distribution of valence, duration of songs and energy of three singers respectively.
 
 # Results{#sec-res}
 ## Valence, Duration and Energy of Three Singers' Songs Over Time
@@ -211,7 +213,6 @@ ggplot(combined_data, aes(x = valence, fill = artist_name)) +
   geom_density(alpha = 0.5) +
   theme_minimal() +
   labs(
-    title = "Distribution of Valence",
     x = "Valence",
     y = "Density",
     fill = "Artist"
@@ -224,7 +225,6 @@ ggplot(combined_data, aes(x = duration_ms, fill = artist_name)) +
   geom_density(alpha = 0.5) +
   theme_minimal() +
   labs(
-    title = "Distribution of Duration (ms)",
     x = "Duration (ms)",
     y = "Density",
     fill = "Artist"
@@ -237,7 +237,6 @@ ggplot(combined_data, aes(x = energy, fill = artist_name)) +
   geom_density(alpha = 0.5) +
   theme_minimal() +
   labs(
-    title = "Distribution of Energy",
     x = "Energy",
     y = "Density",
     fill = "Artist"
